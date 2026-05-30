@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: quote-api-config
+data:
+  # SQLite veritabanını cluster içinde kullanabilmek için çevresel değişken tanımlıyoruz
+  DATABASE_URL: "sqlite:///./quotes.db"
+  AWS_S3_ENDPOINT: "http://quote-localstack-service:4566"

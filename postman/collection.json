@@ -1,0 +1,62 @@
+{
+  "info": {
+    "name": "Quote API Automation Test",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Tüm Sözleri Listele",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": { "raw": "http://localhost:8000/quotes", "host": ["http://localhost:8000"], "path": ["quotes"] }
+      }
+    },
+    {
+      "name": "Yeni Söz Ekle",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8000/quotes?text=Test%20sozu&author=Test%20Yazari&category=motivation",
+          "host": ["http://localhost:8000"],
+          "path": ["quotes"],
+          "query": [
+            { "key": "text", "value": "Test sozu" },
+            { "key": "author", "value": "Test Yazari" },
+            { "key": "category", "value": "motivation" }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Günün Sözünü Getir",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": { "raw": "http://localhost:8000/quotes/today", "host": ["http://localhost:8000"], "path": ["quotes", "today"] }
+      }
+    },
+    {
+      "name": "Sözlerde Arama Yap",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8000/quotes/search?query=Test",
+          "host": ["http://localhost:8000"],
+          "path": ["quotes", "search"],
+          "query": [{ "key": "query", "value": "Test" }]
+        }
+      }
+    },
+    {
+      "name": "Prometheus Metriklerini Kontrol Et",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": { "raw": "http://localhost:8000/metrics", "host": ["http://localhost:8000"], "path": ["metrics"] }
+      }
+    }
+  ]
+}

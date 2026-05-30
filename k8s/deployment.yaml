@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: quote-api-deployment
+spec:
+  replicas: 2 # Uygulamamız kesintisiz çalışsın diye arka arkaya 2 adet pod (kopya) açıyoruz
+  selector:
+    matchLabels:
+      app: quote-api
+  template:
+    metadata:
+      labels:
+        app: quote-api
+    spec:
+      containers:
+        - name: quote-api-container
+          image: quote-api-web:latest # Docker compose ile build ettiğimiz yerel imajımız
+          imagePullPolicy: Never # İmajı internetten çekme, yerel Docker'dan oku (Minikube için kritik)
+          ports:
+            - containerPort: 8000
+          envFrom:
+            - configMapRef:
+                name: quote-api-config

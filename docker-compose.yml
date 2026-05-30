@@ -1,0 +1,43 @@
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: quote_postgres
+    environment:
+      POSTGRES_USER: arda
+      POSTGRES_PASSWORD: supersecretpassword
+      POSTGRES_DB: quotedb
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U arda -d quotedb"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  localstack:
+    image: localstack/localstack:3.0
+    container_name: quote_localstack
+    ports:
+      - "4566:4566"
+    environment:
+      - SERVICES=s3
+      - AWS_DEFAULT_REGION=us-east-1
+
+  web:
+    build: .
+    container_name: quote_api_app
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql://arda:supersecretpassword@db:5432/quotedb
+      - AWS_S3_ENDPOINT=http://localstack:4566
+    depends_on:
+      db:
+        condition: service_healthy
+      localstack:
+        condition: service_started
+
+volumes:
+  postgres_data:

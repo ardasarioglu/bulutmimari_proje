@@ -1,0 +1,12 @@
+fastapi
+uvicorn
+sqlalchemy
+psycopg2-binary
+pytest
+pytest-cov
+testcontainers[postgres]
+factory-boy
+faker
+boto3
+prometheus-fastapi-instrumentator
+playwright
