@@ -11,7 +11,6 @@ jobs:
     runs-on: ubuntu-latest
 
     services:
-      # Testlerin koşturulabilmesi için geçici bir PostgreSQL ayağa kaldırıyoruz (Şartname Ek B uyumlu)
       postgres:
         image: postgres:15-alpine
         env:
@@ -22,34 +21,36 @@ jobs:
           - 5432:5432
         options: >-
           --health-cmd "pg_isready -U arda -d quotedb"
-          --health-interval 10s
+          --health-interval 5s
           --health-timeout 5s
           --health-retries 5
 
     steps:
     - name: Kodu Kopyala (Checkout)
-      uses: actions/checkout@v4 [cite: 207]
+      uses: actions/checkout@v4
 
     - name: Python Ortamını Kur
-      uses: actions/setup-python@v5 [cite: 208]
+      uses: actions/setup-python@v5
       with:
-        python-version: '3.11' [cite: 209]
+        python-version: '3.11'
 
     - name: Bağımlılıkları Yükle
       run: |
         python -m pip install --upgrade pip
-        pip install -r requirements.txt [cite: 210]
+        pip install -r requirements.txt
+
+    - name: Veritabanının Tamamen Hazır Olmasını Bekle
+      run: sleep 5
 
     - name: 1. Adım - Pytest Unit Testleri ve Coverage Kontrolü
       env:
         DATABASE_URL: postgresql://arda:supersecretpassword@localhost:5432/quotedb
       run: |
-        # %70 coverage barajının altına düşerse pipeline'ı patlat (Şartname gereği)
-        PYTHONPATH=. pytest --cov=src --cov-fail-under=70 tests/ [cite: 211]
+        PYTHONPATH=. pytest --cov=src --cov-fail-under=70 tests/
 
     - name: 2. Adım - Multi-stage Docker Build Testi
       run: |
-        docker build -t quote-api-web:${{ github.sha }} . [cite: 212]
+        docker build -t quote-api-web:${{ github.sha }} .
 
     - name: Node.js Kur (Newman için)
       uses: actions/setup-node@v4
@@ -62,10 +63,10 @@ jobs:
     - name: Uygulamayı Geçici Olarak Arka Planda Başlat (Smoke/Newman Testi için)
       env:
         DATABASE_URL: postgresql://arda:supersecretpassword@localhost:5432/quotedb
-        AWS_S3_ENDPOINT: http://localhost:4566 # G Actions yerel simülasyonu için geçici url
+        AWS_S3_ENDPOINT: http://localhost:4566
       run: |
         uvicorn src.main:app --host 0.0.0.0 --port 8000 &
-        sleep 3 # Uygulamanın tam açılması için 3 saniye bekle
+        sleep 5
 
     - name: 3. Adım - Newman ile Postman İstek Otomasyonu
       run: |
