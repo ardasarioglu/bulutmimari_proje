@@ -99,6 +99,7 @@ def update_quote(quote_id: int, text: str = None, author: str = None, category: 
         raise HTTPException(status_code=404, detail="Güncellenmek istenen söz bulunamadı.")
     return quote
 
+
 @app.delete("/quotes/{quote_id}")
 def delete_quote(quote_id: int, db: Session = Depends(get_db)):
     success = services.delete_quote(db, quote_id)
@@ -118,7 +119,7 @@ def get_ui():
     </head>
     <body>
         <h1>Quote API Test Arayüzü</h1>
-        
+
         <div style="margin-bottom: 20px; padding: 10px; border: 1px solid #ccc;">
             <h2>Günün Sözü</h2>
             <button id="getQodBtn" onclick="getQod()">Getir</button>

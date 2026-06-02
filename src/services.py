@@ -41,6 +41,7 @@ def update_quote(db: Session, quote_id: int, text: str = None, author: str = Non
         db.refresh(db_quote)
     return db_quote
 
+
 def delete_quote(db: Session, quote_id: int):
     """Veritabanından id'ye göre söz siler."""
     db_quote = db.query(Quote).filter(Quote.id == quote_id).first()

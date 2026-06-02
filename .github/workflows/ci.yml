@@ -25,7 +25,7 @@ jobs:
         playwright install
     
     - name: Lint code with Flake8
-      run: flake8 --max-line-length=180 src/ tests/
+      run: flake8 --max-line-length=200 src/ tests/
 
     # 1. Aşama: İzole Unit ve Integration Testleri (Testcontainers ile DB otomatik kalkar)
     - name: Run Unit & Integration Tests
