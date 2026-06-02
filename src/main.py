@@ -108,6 +108,15 @@ def delete_quote(quote_id: int, db: Session = Depends(get_db)):
     return {"message": "Söz başarıyla silindi."}
 
 
+@app.get("/quotes/{quote_id}")
+def get_quote(quote_id: int, db: Session = Depends(get_db)):
+    quote = services.get_quote_by_id(db, quote_id)
+    if not quote:
+        # İşte Postman'in beklediği 404 hatası tam olarak buradan dönecek
+        raise HTTPException(status_code=404, detail="Söz bulunamadı.")
+    return quote
+
+
 @app.get("/", response_class=HTMLResponse)
 def get_ui():
     return """<!DOCTYPE html>

@@ -50,3 +50,8 @@ def delete_quote(db: Session, quote_id: int):
         db.commit()
         return True
     return False
+
+
+def get_quote_by_id(db: Session, quote_id: int):
+    """Belirli bir ID'ye sahip sözü getirir."""
+    return db.query(Quote).filter(Quote.id == quote_id).first()
