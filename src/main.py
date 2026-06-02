@@ -103,7 +103,7 @@ def get_ui():
         <style>body { font-family: sans-serif; max-width: 600px; margin: 20px auto; }</style>
     </head>
     <body>
-        <h1>Quote API Test Arayüzü</h1>       
+        <h1>Quote API Test Arayüzü</h1>
         <div style="margin-bottom: 20px; padding: 10px; border: 1px solid #ccc;">
             <h2>Günün Sözü</h2>
             <button id="getQodBtn" onclick="getQod()">Getir</button>

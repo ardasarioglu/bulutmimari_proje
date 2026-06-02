@@ -14,8 +14,9 @@ def get_quote_of_the_day(db: Session):
 def search_quotes(db: Session, query: str):
     """Yazar ismine veya söz metnine göre filtreleme yapar."""
     return db.query(Quote).filter(
-        (Quote.author.ilike(f"%{query}%")) 
-        | (Quote.text.ilike(f"%{query}%"))
+        (Quote.author.ilike(f"%{query}%"))
+        |
+        (Quote.text.ilike(f"%{query}%"))
     ).all()
 
 
