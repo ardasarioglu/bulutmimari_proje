@@ -41,6 +41,10 @@ jobs:
 
     - name: Veritabanının Tamamen Hazır Olmasını Bekle
       run: sleep 5
+      
+    - name: 0. Adım - Linting (Kod Standartları Kontrolü)
+      run: |
+        flake8 src/ tests/ --max-line-length=120 --ignore=E501,F401
 
     - name: 1. Adım - Pytest Unit Testleri ve Coverage Kontrolü
       env:

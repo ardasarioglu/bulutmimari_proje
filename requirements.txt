@@ -10,3 +10,5 @@ faker
 boto3
 prometheus-fastapi-instrumentator
 playwright
+httpx
+flake8

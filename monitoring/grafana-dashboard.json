@@ -1,0 +1,20 @@
+{
+  "title": "Quote API Metrics",
+  "panels": [
+    {
+      "title": "Total Requests",
+      "type": "stat",
+      "targets": [ { "expr": "sum(http_requests_total)", "legendFormat": "Requests" } ]
+    },
+    {
+      "title": "Error Rate (5xx)",
+      "type": "stat",
+      "targets": [ { "expr": "sum(rate(http_requests_total{status=~\"5..\"}[1m]))", "legendFormat": "Errors/sec" } ]
+    },
+    {
+      "title": "p95 Latency",
+      "type": "timeseries",
+      "targets": [ { "expr": "histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket[1m])) by (le))", "legendFormat": "p95 (s)" } ]
+    }
+  ]
+}

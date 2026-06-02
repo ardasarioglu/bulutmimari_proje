@@ -5,6 +5,7 @@ from src.models import Base, Quote
 from src import services
 import os
 import boto3
+from fastapi.responses import HTMLResponse
 
 app = FastAPI(title="Quote of the Day API")
 
@@ -78,3 +79,77 @@ def add_quote(text: str, author: str, category: str, db: Session = Depends(get_d
 @app.get("/quotes")
 def get_all_quotes(db: Session = Depends(get_db)):
     return db.query(Quote).all()
+
+@app.get("/", response_class=HTMLResponse)
+def get_ui():
+    return """
+    <!DOCTYPE html>
+    <html lang="tr">
+    <head>
+        <meta charset="UTF-8">
+        <title>Quote API E2E UI</title>
+        <style>body { font-family: sans-serif; max-width: 600px; margin: 20px auto; }</style>
+    </head>
+    <body>
+        <h1>Quote API Test Arayüzü</h1>
+        
+        <div style="margin-bottom: 20px; padding: 10px; border: 1px solid #ccc;">
+            <h2>Günün Sözü</h2>
+            <button id="getQodBtn" onclick="getQod()">Getir</button>
+            <p id="qodResult"></p>
+        </div>
+
+        <div style="margin-bottom: 20px; padding: 10px; border: 1px solid #ccc;">
+            <h2>Söz Ekle</h2>
+            <input type="text" id="qText" placeholder="Söz Metni"><br><br>
+            <input type="text" id="qAuthor" placeholder="Yazar"><br><br>
+            <input type="text" id="qCategory" placeholder="Kategori"><br><br>
+            <button id="addBtn" onclick="addQuote()">Ekle</button>
+            <p id="addResult" style="color: green; font-weight: bold;"></p>
+        </div>
+
+        <div style="margin-bottom: 20px; padding: 10px; border: 1px solid #ccc;">
+            <h2>Arama Yap</h2>
+            <input type="text" id="sQuery" placeholder="Aranacak Kelime">
+            <button id="searchBtn" onclick="searchQuote()">Ara</button>
+            <ul id="searchResult"></ul>
+        </div>
+
+        <script>
+            async function getQod() {
+                let res = await fetch('/quotes/today');
+                if(res.ok) {
+                    let data = await res.json();
+                    document.getElementById('qodResult').innerText = data.text + " - " + data.author;
+                } else {
+                    document.getElementById('qodResult').innerText = "Henüz söz yok.";
+                }
+            }
+            async function addQuote() {
+                let t = document.getElementById('qText').value;
+                let a = document.getElementById('qAuthor').value;
+                let c = document.getElementById('qCategory').value;
+                let res = await fetch(`/quotes?text=${encodeURIComponent(t)}&author=${encodeURIComponent(a)}&category=${encodeURIComponent(c)}`, {method: 'POST'});
+                if(res.ok) {
+                    document.getElementById('addResult').innerText = "Başarıyla Eklendi!";
+                }
+            }
+            async function searchQuote() {
+                let q = document.getElementById('sQuery').value;
+                let res = await fetch(`/quotes/search?query=${encodeURIComponent(q)}`);
+                if(res.ok) {
+                    let data = await res.json();
+                    let ul = document.getElementById('searchResult');
+                    ul.innerHTML = "";
+                    data.forEach(d => {
+                        let li = document.createElement('li');
+                        li.innerText = d.text + " (" + d.author + ")";
+                        ul.appendChild(li);
+                    });
+                }
+            }
+        </script>
+    </body>
+    </html>
+    """
+

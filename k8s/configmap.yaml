@@ -3,6 +3,6 @@ kind: ConfigMap
 metadata:
   name: quote-api-config
 data:
-  # SQLite veritabanını cluster içinde kullanabilmek için çevresel değişken tanımlıyoruz
-  DATABASE_URL: "sqlite:///./quotes.db"
+  # Kubernetes içindeki PostgreSQL servisine bağlanacak şekilde URL'yi güncelledik
+  DATABASE_URL: "postgresql://arda:supersecretpassword@quote-postgres-service:5432/quotedb"
   AWS_S3_ENDPOINT: "http://quote-localstack-service:4566"
