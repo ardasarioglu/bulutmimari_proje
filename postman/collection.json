@@ -5,6 +5,33 @@
   },
   "item": [
     {
+      "name": "Get Non-Existent Quote (Negative)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8000/quotes/99999",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8000",
+          "path": ["quotes", "99999"]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 404\", function () {",
+              "    pm.response.to.have.status(404);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
       "name": "Tüm Sözleri Listele",
       "request": {
         "method": "GET",

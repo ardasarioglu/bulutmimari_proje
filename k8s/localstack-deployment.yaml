@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: quote-localstack
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: quote-localstack
+  template:
+    metadata:
+      labels:
+        app: quote-localstack
+    spec:
+      containers:
+      - name: localstack
+        image: localstack/localstack:latest
+        ports:
+        - containerPort: 4566
+        env:
+        - name: SERVICES
+          value: s3

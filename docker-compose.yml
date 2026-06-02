@@ -26,6 +26,7 @@ services:
       - AWS_DEFAULT_REGION=us-east-1
 
   web:
+    image: ${API_IMAGE:-quote-api-web:local} # CI'dan gelen imajı al, yoksa locale göre isimlendir
     build: .
     container_name: quote_api_app
     ports:
