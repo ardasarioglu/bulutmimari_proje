@@ -6,6 +6,9 @@ jobs:
   build-and-test:
     runs-on: ubuntu-latest
 
+    env:
+      PYTHONPATH: .
+
     steps:
     - name: Checkout Code
       uses: actions/checkout@v4
