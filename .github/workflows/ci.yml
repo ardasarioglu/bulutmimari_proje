@@ -38,7 +38,7 @@ jobs:
       env:
         API_IMAGE: quote-api-web:${{ github.sha }}
       run: |
-        docker-compose up -d
+        docker compose up -d
         sleep 15 # Servislerin (DB, LocalStack, API) tam hazır olması için bekleme süresi
 
     # 4. Aşama: E2E Testleri (Docker container'ındaki API'ye istek atar)
