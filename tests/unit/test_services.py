@@ -87,3 +87,34 @@ def test_main_s3_client_coverage():
     from src.main import get_s3_client
     s3 = get_s3_client()
     assert s3 is not None
+
+
+def test_update_quote_service(db_session):
+    """Var olan bir sozun guncellenmesini test eder."""
+    # Given
+    quote = services.create_quote(db_session, "Eski", "Yazar", "Kategori")
+    
+    # When
+    updated_quote = services.update_quote(db_session, quote.id, text="Yeni Metin", author="Yeni Yazar")
+    
+    # Then
+    assert updated_quote.text == "Yeni Metin"
+    assert updated_quote.author == "Yeni Yazar"
+    assert updated_quote.category == "Kategori" # Degismemesi lazim
+
+
+def test_delete_quote_service(db_session):
+    """Var olan bir sozun silinmesini test eder."""
+    # Given
+    quote = services.create_quote(db_session, "Silinecek", "Yazar", "Kategori")
+    quote_id = quote.id
+    
+    # When
+    result = services.delete_quote(db_session, quote_id)
+    
+    # Then
+    assert result is True
+    
+    # Olmayan ID'yi silmeye veya guncellemeye calisinca ne oldugunu da test et
+    assert services.delete_quote(db_session, 9999) is False
+    assert services.update_quote(db_session, 9999, text="Yok") is None

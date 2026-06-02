@@ -45,3 +45,48 @@ def test_search_quotes_endpoint(client):
 
     assert len(data) > 0
     assert "Spesifik Bir Arama Sözü" in data[0]["text"]
+
+
+def test_get_today_quote_endpoint(client):
+    """GET /quotes/today endpoint'inin calistigini test eder."""
+    # Veritabanının bos olmamasini garantiye alalim
+    client.post("/quotes", params={
+        "text": "Gunun Sozu Testi",
+        "author": "Gunun Yazari",
+        "category": "test"
+    })
+    
+    response = client.get("/quotes/today")
+    assert response.status_code == 200
+    data = response.json()
+    assert "text" in data
+    assert "author" in data
+
+
+def test_update_quote_endpoint(client):
+    """PUT /quotes/{id} endpoint'ini test eder."""
+    # Once bir veri ekle
+    post_res = client.post("/quotes", params={"text": "Eski Soz", "author": "Yazar", "category": "test"})
+    quote_id = post_res.json()["id"]
+
+    # Sonra guncelle
+    put_res = client.put(f"/quotes/{quote_id}", params={"text": "Yeni Soz", "author": "Yeni Yazar"})
+    assert put_res.status_code == 200
+    data = put_res.json()
+    assert data["text"] == "Yeni Soz"
+    assert data["author"] == "Yeni Yazar"
+
+
+def test_delete_quote_endpoint(client):
+    """DELETE /quotes/{id} endpoint'ini test eder."""
+    # Once bir veri ekle
+    post_res = client.post("/quotes", params={"text": "Silinecek Soz", "author": "Yazar", "category": "test"})
+    quote_id = post_res.json()["id"]
+
+    # Sonra sil
+    del_res = client.delete(f"/quotes/{quote_id}")
+    assert del_res.status_code == 200
+
+    # Silindigini dogrula (Yanlis ID guncelleme denemesiyle)
+    put_res = client.put(f"/quotes/{quote_id}", params={"text": "Yok"})
+    assert put_res.status_code == 404
