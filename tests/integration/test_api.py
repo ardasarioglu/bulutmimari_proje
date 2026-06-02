@@ -55,7 +55,7 @@ def test_get_today_quote_endpoint(client):
         "author": "Gunun Yazari",
         "category": "test"
     })
-    
+
     response = client.get("/quotes/today")
     assert response.status_code == 200
     data = response.json()
