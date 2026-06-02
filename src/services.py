@@ -2,6 +2,7 @@ from sqlalchemy.orm import Session
 from src.models import Quote
 import random
 
+
 def get_quote_of_the_day(db: Session):
     """Veritabanındaki sözlerden rastgele birini günün sözü seçer."""
     quotes = db.query(Quote).all()
@@ -9,12 +10,14 @@ def get_quote_of_the_day(db: Session):
         return None
     return random.choice(quotes)
 
+
 def search_quotes(db: Session, query: str):
     """Yazar ismine veya söz metnine göre filtreleme yapar."""
     return db.query(Quote).filter(
-        (Quote.author.ilike(f"%{query}%")) | 
+        (Quote.author.ilike(f"%{query}%")) |
         (Quote.text.ilike(f"%{query}%"))
     ).all()
+
 
 def create_quote(db: Session, text: str, author: str, category: str):
     """Veritabanına yeni bir söz ekler."""

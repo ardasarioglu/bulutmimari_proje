@@ -2,6 +2,7 @@ from src import services
 from tests.factories import QuoteFactory
 from src.models import Quote
 
+
 def test_create_quote(db_session):
     # Given
     text = "Bilgi guctur."
@@ -16,6 +17,7 @@ def test_create_quote(db_session):
     assert quote.text == text
     assert quote.author == author
 
+
 def test_get_quote_of_the_day(db_session):
     # Given
     mock_quote = QuoteFactory()
@@ -28,6 +30,7 @@ def test_get_quote_of_the_day(db_session):
     # Then
     assert quote is not None
     assert quote.text == mock_quote.text
+
 
 def test_search_quotes(db_session):
     # Given
@@ -42,10 +45,12 @@ def test_search_quotes(db_session):
     assert len(results) == 1
     assert results[0].author == "Hippocrates"
 
+
 def test_get_all_quotes_direct(db_session):
     """Veritabani uzerinden tum sozleri cekmeyi doğrudan test eder (Coverage yukseltir)."""
     # Given
-    q = Quote(text="Muzik ruhun gidasidir.", author="Anonim", category="motivation")
+    q = Quote(text="Muzik ruhun gidasidir.",
+              author="Anonim", category="motivation")
     db_session.add(q)
     db_session.commit()
 
@@ -56,13 +61,15 @@ def test_get_all_quotes_direct(db_session):
     assert len(all_quotes) == 1
     assert all_quotes[0].author == "Anonim"
 
+
 def test_services_empty_db(db_session):
     """Veritabanı bosken gunun sozu fonksiyonunun None dondugunu test eder."""
     # When
     quote = services.get_quote_of_the_day(db_session)
-    
+
     # Then
     assert quote is None
+
 
 def test_main_get_db_coverage():
     """main.py icindeki get_db dependency fonksiyonunu kapsar."""
@@ -73,6 +80,7 @@ def test_main_get_db_coverage():
         assert db is not None
     except StopIteration:
         pass
+
 
 def test_main_s3_client_coverage():
     """main.py icindeki get_s3_client fonksiyonunu kapsar."""
