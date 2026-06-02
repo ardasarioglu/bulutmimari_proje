@@ -25,3 +25,27 @@ def create_quote(db: Session, text: str, author: str, category: str):
     db.commit()
     db.refresh(db_quote)
     return db_quote
+
+
+def update_quote(db: Session, quote_id: int, text: str = None, author: str = None, category: str = None):
+    """Var olan bir sözü günceller."""
+    db_quote = db.query(Quote).filter(Quote.id == quote_id).first()
+    if db_quote:
+        if text:
+            db_quote.text = text
+        if author:
+            db_quote.author = author
+        if category:
+            db_quote.category = category
+        db.commit()
+        db.refresh(db_quote)
+    return db_quote
+
+def delete_quote(db: Session, quote_id: int):
+    """Veritabanından id'ye göre söz siler."""
+    db_quote = db.query(Quote).filter(Quote.id == quote_id).first()
+    if db_quote:
+        db.delete(db_quote)
+        db.commit()
+        return True
+    return False

@@ -92,10 +92,24 @@ def get_all_quotes(db: Session = Depends(get_db)):
     return db.query(Quote).all()
 
 
+@app.put("/quotes/{quote_id}")
+def update_quote(quote_id: int, text: str = None, author: str = None, category: str = None, db: Session = Depends(get_db)):
+    quote = services.update_quote(db, quote_id, text, author, category)
+    if not quote:
+        raise HTTPException(status_code=404, detail="Güncellenmek istenen söz bulunamadı.")
+    return quote
+
+@app.delete("/quotes/{quote_id}")
+def delete_quote(quote_id: int, db: Session = Depends(get_db)):
+    success = services.delete_quote(db, quote_id)
+    if not success:
+        raise HTTPException(status_code=404, detail="Silinmek istenen söz bulunamadı.")
+    return {"message": "Söz başarıyla silindi."}
+
+
 @app.get("/", response_class=HTMLResponse)
 def get_ui():
-    return """
-    <!DOCTYPE html>
+    return """<!DOCTYPE html>
     <html lang="tr">
     <head>
         <meta charset="UTF-8">
@@ -104,6 +118,7 @@ def get_ui():
     </head>
     <body>
         <h1>Quote API Test Arayüzü</h1>
+        
         <div style="margin-bottom: 20px; padding: 10px; border: 1px solid #ccc;">
             <h2>Günün Sözü</h2>
             <button id="getQodBtn" onclick="getQod()">Getir</button>
@@ -126,6 +141,29 @@ def get_ui():
             <ul id="searchResult"></ul>
         </div>
 
+        <div style="margin-bottom: 20px; padding: 10px; border: 1px solid #ccc;">
+            <h2>Söz Güncelle</h2>
+            <input type="number" id="uId" placeholder="Söz ID (Zorunlu)"><br><br>
+            <input type="text" id="uText" placeholder="Yeni Söz Metni (Opsiyonel)"><br><br>
+            <input type="text" id="uAuthor" placeholder="Yeni Yazar (Opsiyonel)"><br><br>
+            <input type="text" id="uCategory" placeholder="Yeni Kategori (Opsiyonel)"><br><br>
+            <button id="updateBtn" onclick="updateQuote()">Güncelle</button>
+            <p id="updateResult" style="color: blue; font-weight: bold;"></p>
+        </div>
+
+        <div style="margin-bottom: 20px; padding: 10px; border: 1px solid #ccc;">
+            <h2>Söz Sil</h2>
+            <input type="number" id="dId" placeholder="Silinecek Söz ID">
+            <button id="deleteBtn" onclick="deleteQuote()">Sil</button>
+            <p id="deleteResult" style="color: red; font-weight: bold;"></p>
+        </div>
+
+        <div style="margin-bottom: 20px; padding: 10px; border: 1px solid #ccc;">
+            <h2>Tüm Sözler Listesi</h2>
+            <button id="getAllBtn" onclick="getAllQuotes()">Tümünü Listele</button>
+            <ul id="allQuotesResult" style="margin-top: 10px; padding-left: 20px;"></ul>
+        </div>
+
         <script>
             async function getQod() {
                 let res = await fetch('/quotes/today');
@@ -143,6 +181,7 @@ def get_ui():
                 let res = await fetch(`/quotes?text=${encodeURIComponent(t)}&author=${encodeURIComponent(a)}&category=${encodeURIComponent(c)}`, {method: 'POST'});
                 if(res.ok) {
                     document.getElementById('addResult').innerText = "Başarıyla Eklendi!";
+                    getAllQuotes(); // Yeni eklenen sözü listede anlık görmek için otomatik yeniliyoruz
                 }
             }
             async function searchQuote() {
@@ -157,6 +196,54 @@ def get_ui():
                         li.innerText = d.text + " (" + d.author + ")";
                         ul.appendChild(li);
                     });
+                }
+            }
+            async function updateQuote() {
+                let id = document.getElementById('uId').value;
+                if(!id) { alert("Güncelleme için ID numarası girmek zorundasın!"); return; }
+                let t = document.getElementById('uText').value;
+                let a = document.getElementById('uAuthor').value;
+                let c = document.getElementById('uCategory').value;
+                let params = new URLSearchParams();
+                if(t) params.append('text', t);
+                if(a) params.append('author', a);
+                if(c) params.append('category', c);
+                let res = await fetch(`/quotes/${id}?${params.toString()}`, {method: 'PUT'});
+                if(res.ok) {
+                    document.getElementById('updateResult').innerText = "Başarıyla Güncellendi!";
+                    getAllQuotes(); // Güncellenen halini listede görmek için yeniliyoruz
+                } else {
+                    document.getElementById('updateResult').innerText = "Hata: Güncellenemedi.";
+                }
+            }
+            async function deleteQuote() {
+                let id = document.getElementById('dId').value;
+                if(!id) { alert("Silmek için ID numarası girmek zorundasın!"); return; }
+                let res = await fetch(`/quotes/${id}`, {method: 'DELETE'});
+                if(res.ok) {
+                    document.getElementById('deleteResult').innerText = "Başarıyla Silindi!";
+                    getAllQuotes(); // Silinen sözün listeden kaybolması için yeniliyoruz
+                } else {
+                    document.getElementById('deleteResult').innerText = "Hata: Silinemedi.";
+                }
+            }
+            async function getAllQuotes() {
+                let res = await fetch('/quotes');
+                if(res.ok) {
+                    let data = await res.json();
+                    let ul = document.getElementById('allQuotesResult');
+                    ul.innerHTML = "";
+                    if(data.length === 0) {
+                        ul.innerHTML = "<li>Veritabanında henüz hiç söz yok.</li>";
+                        return;
+                    }
+                    data.forEach(d => {
+                        let li = document.createElement('li');
+                        li.innerHTML = `<strong>ID:</strong> ${d.id} | <strong>Söz:</strong> "${d.text}" | <strong>Yazar:</strong> ${d.author} | <strong>Kategori:</strong> ${d.category}`;
+                        ul.appendChild(li);
+                    });
+                } else {
+                    document.getElementById('allQuotesResult').innerText = "Sözler yüklenirken bir hata oluştu.";
                 }
             }
         </script>
