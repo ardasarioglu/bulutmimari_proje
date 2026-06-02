@@ -39,6 +39,27 @@ services:
         condition: service_healthy
       localstack:
         condition: service_started
+  
+  prometheus:
+    image: prom/prometheus:v2.45.0
+    container_name: quote-api-prometheus
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+    depends_on:
+      - web
+
+  grafana:
+    image: grafana/grafana:10.0.0
+    container_name: quote-api-grafana
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana-storage:/var/lib/grafana
+    depends_on:
+      - prometheus
 
 volumes:
   postgres_data:
+  grafana-storage:
