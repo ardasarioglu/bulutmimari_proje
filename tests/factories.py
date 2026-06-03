@@ -11,5 +11,5 @@ class QuoteFactory(factory.Factory):
     text = factory.Faker("sentence", nb_words=10)
     # Rastgele bir yazar ismi üretir
     author = factory.Faker("name")
-    # Sırayla bu kategorileri atar
+    # Sırayla bu kategorileri
     category = factory.Iterator(["motivation", "philosophy", "history"])
