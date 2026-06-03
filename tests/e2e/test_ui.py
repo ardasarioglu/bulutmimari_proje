@@ -1,9 +1,9 @@
 from playwright.sync_api import sync_playwright
 
-
 def test_e2e_scenarios():
     with sync_playwright() as p:
-        # headless=True yaparsan tarayıcıyı arkaplanda gizli çalıştırır. CI/CD'de bu True olmalı.
+        # CI/CD pipeline'ında patlamaması için headless=True KALMAK ZORUNDA.
+        # Demoda kendi gözlerinle görmek istersen geçici olarak False yapabilirsin.
         browser = p.chromium.launch(headless=True)
         page = browser.new_page()
 
@@ -11,7 +11,7 @@ def test_e2e_scenarios():
         page.goto("http://localhost:8000/")
         assert "Quote API" in page.title()
 
-        # Senaryo 2: Arayüzden yeni söz eklenmesi
+        # Senaryo 2: Arayüzden yeni söz eklenmesi (Bu veritabanındaki ilk veri, yani ID'si 1 olacak)
         page.fill("#qText", "Playwright ile otomatik test sözü")
         page.fill("#qAuthor", "Test Robotu")
         page.fill("#qCategory", "automation")
@@ -31,5 +31,17 @@ def test_e2e_scenarios():
         page.wait_for_selector("#qodResult")
         qod_text = page.inner_text("#qodResult")
         assert len(qod_text) > 5
+
+        # Senaryo 5: Söz Güncelleme (ID = 1)
+        page.fill("#uId", "1")
+        page.fill("#uText", "Playwright ile güncellenmiş söz")
+        page.fill("#uAuthor", "Güncel Robot")
+        page.click("#updateBtn")
+        page.wait_for_selector("text=Başarıyla Güncellendi!")
+
+        # Senaryo 6: Söz Silme (ID = 1)
+        page.fill("#dId", "1")
+        page.click("#deleteBtn")
+        page.wait_for_selector("text=Başarıyla Silindi!")
 
         browser.close()
