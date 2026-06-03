@@ -1,5 +1,6 @@
 from playwright.sync_api import sync_playwright
 
+
 def test_e2e_scenarios():
     with sync_playwright() as p:
         # CI/CD pipeline'ında patlamaması için headless=True KALMAK ZORUNDA.
